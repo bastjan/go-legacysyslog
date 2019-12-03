@@ -2,7 +2,11 @@ package legacysyslog
 
 import (
 	"fmt"
+
+	"github.com/influxdata/go-syslog/v2/common"
 )
+
+var _ = fmt.Print
 
 %%{
 machine legacysyslog;
@@ -18,43 +22,100 @@ action print {
 	fmt.Println("Val: ", string(m.text()))
 }
 
+action set_priority {
+	output.priority = uint8(common.UnsafeUTF8DecimalCodePointsToInt(m.text()))
+	output.prioritySet = true
+}
+
+action set_cisco_sequence_id {
+	output.ciscoSequenceIDSet = true
+	output.ciscoSequenceID = string(m.text())
+}
+
+action set_cisco_timestamp_ext {
+	switch m.data[m.p-1] {
+	case '.':
+		output.ciscoTimestampExt = CiscoTimeClockModeSynced
+	case '*':
+		output.ciscoTimestampExt = CiscoTimeClockModeUnsynced
+	}
+}
+
+action set_timestamp {
+	output.timestampSet = true
+	output.timestamp += string(m.text())
+}
+
+action append_linksys_year {
+	output.timestamp += " " + string(m.text())
+}
+
+action set_hostname {
+	output.hostnameSet = true
+	output.hostname = string(m.text())
+}
+
+action set_tag {
+	output.tagSet = true
+	output.tag = string(m.text())
+}
+
+action set_content {
+	output.contentSet = true
+	output.content = string(m.text())
+}
+
+action set_message {
+	output.messageSet = true
+	output.message = string(m.text())
+}
+
 action print_err {
-	// cs:1 p:26 pe:55 eof:55 pb:8
 	fmt.Println("-- ERROR --")
 	fmt.Println("POS: ", m.p)
 	fmt.Println("Last mark: ", m.pb)
 	fmt.Printf("Str: '%s'\n", string(m.text()))
 	fmt.Printf("Before: '%s'\n", string(m.data[:m.p]))
 	fmt.Printf("After: '%s'\n", string(m.data[m.p:]))
+	fmt.Print("-- ERROR --\n\n")
 
 	return fmt.Errorf("failed at %d", m.p)
 }
 
 # https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L51
-priority = '<' digit* >mark %print '>';
+priority = '<' digit* >mark %set_priority '>';
 
 # https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L185
-cisco_sequence_id = digit* >mark %print ': ';
+cisco_sequence_id = digit* >mark %set_cisco_sequence_id ': ';
 
 # https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L214
-cisco_timestamp_attributes = [*.] >mark %print;
+cisco_timestamp_attributes = [*.] %set_cisco_timestamp_ext;
 
 # TODO: Case insensitive 
 month_abrev = ('Jan' | 'Feb' | 'Mar' | 'Apr' | 'May' | 'Jun' | 'Jul' | 'Aug' | 'Sep' | 'Oct' | 'Nov' | 'Dec');
 bsd_day = ([0 ] . '1'..'9' | '1'..'2' . '0'..'9' | '3' . '0'..'1');
+# TODO: syslog-ng actually allows space instead of 0
 hhmmss = digit{2} ':' digit{2} ':' digit{2};
 
-# https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L220
-cisco_timestamp = (month_abrev ' ' bsd_day ' ' digit{4} ' ' hhmmss);
-
-# https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L261
-linksys_timestamp = (month_abrev ' ' bsd_day ' ' hhmmss ' ' digit{4} ' ');
+cisco_timestamp =
+	# https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L220
+	(month_abrev ' ' bsd_day ' ' digit{4} ' ' hhmmss) >mark %set_timestamp
+	# https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L211
+	[: ] >{ fhold; }
+	;
 
 # https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L145
-bsd_stamp = (month_abrev ' ' bsd_day ' ' hhmmss);
+bsd_stamp = (month_abrev ' ' bsd_day ' ' hhmmss) >mark %set_timestamp;
+
+# https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L261
+linksys_timestamp =
+	# we have 2 final states here - the bsd stamp begins with the same characters
+	# so set_timestamp and append_linksys_year is called
+	(bsd_stamp ' ' digit{4}) >mark %append_linksys_year
+	' ' >{ fhold; };
 
 # https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L391
-rfc3164_stamp = (cisco_timestamp | linksys_timestamp | bsd_stamp) >mark %print;
+rfc3164_stamp = (cisco_timestamp | linksys_timestamp | bsd_stamp );
 
 iso_stamp = 'TODO';
 
@@ -65,8 +126,23 @@ timestamp =
 	':'?
 	;
 
-# TODO
-host = graph+ >mark %print;  
+# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L456
+# TODO: ipv6 heuristics
+# TODO: check hostname and badhostname options
+hostname = (any - [\[ ])* >mark %set_hostname ' ';
+
+# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L315
+tag = (any - [\[: ])* >mark %set_tag;
+
+content = 
+	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L330
+	'['
+	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L333
+	(any - [\]: ])* >mark %set_content
+	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L342
+	']'? ;
+
+tag_optional_content = tag content? [: ] ' '?;
 
 main := 
 	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L757
@@ -78,10 +154,20 @@ main :=
 	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L764
 	cisco_timestamp_attributes?
 
-	# TODO from here
+	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L767
+	# TODO: no timestamp case
 	timestamp
+	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L775
 	' '*
-	host
+	# TODO: last message repeated / forwarded from
+	hostname
+	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L804
+	' '*
+	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L808
+	tag_optional_content
+
+	# TODO validate utf8 option
+	any* >mark %set_message
 
 	$!print_err
 	;
@@ -123,7 +209,7 @@ func (m *machine) text() []byte {
 }
 
 // Parse parses the input byte array as a RFC3164 syslog message.
-func (m *machine) Parse(input []byte) error {
+func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 	m.data = input
 	m.p = 0
 	m.pb = 0
@@ -131,8 +217,10 @@ func (m *machine) Parse(input []byte) error {
 	m.eof = len(input)
 	m.err = nil
 
+	output := &syslogMessage{}
+
 	%% write init;
 	%% write exec;
 
-	return nil
+	return output.export(), m.err
 }
