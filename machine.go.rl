@@ -2,6 +2,9 @@ package legacysyslog
 
 import (
 	"fmt"
+	"time"
+	"bytes"
+	"strconv"
 
 	"github.com/influxdata/go-syslog/v2/common"
 )
@@ -41,13 +44,42 @@ action set_cisco_timestamp_ext {
 	}
 }
 
-action set_timestamp {
-	output.timestampSet = true
-	output.timestamp += string(m.text())
+action set_bsd_timestamp {
+	{
+		output.timestampSet = true
+		t, err := time.Parse(time.Stamp, string(m.text()))
+		if err != nil {
+			m.err = err
+			return output.export(), m.err
+		}
+		output.timestamp = t
+	}
+}
+
+action set_cisco_timestamp {
+	{
+		output.timestampSet = true
+		t, err := time.Parse("Jan _2 2006 15:04:05", string(m.text()))
+		if err != nil {
+			m.err = err
+			return output.export(), m.err
+		}
+		output.timestamp = t
+	}
 }
 
 action append_linksys_year {
-	output.timestamp += " " + string(m.text())
+	{
+		yearRaw := bytes.Trim(m.text(), " ")
+		year, err := strconv.Atoi(string(yearRaw))
+		if err != nil {
+			m.err = err
+			return output.export(), m.err
+		}
+		// Date(year int, month Month, day, hour, min, sec, nsec int, loc *Location) Time
+		t := output.timestamp.UTC()
+		output.timestamp = time.Date(year, t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), time.UTC)
+	}
 }
 
 action set_hostname {
@@ -99,13 +131,13 @@ hhmmss = digit{2} ':' digit{2} ':' digit{2};
 
 cisco_timestamp =
 	# https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L220
-	(month_abrev ' ' bsd_day ' ' digit{4} ' ' hhmmss) >mark %set_timestamp
+	(month_abrev ' ' bsd_day ' ' digit{4} ' ' hhmmss) >mark %set_cisco_timestamp
 	# https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L211
 	[: ] >{ fhold; }
 	;
 
 # https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L145
-bsd_stamp = (month_abrev ' ' bsd_day ' ' hhmmss) >mark %set_timestamp;
+bsd_stamp = (month_abrev ' ' bsd_day ' ' hhmmss) >mark %set_bsd_timestamp;
 
 # https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L261
 linksys_timestamp =

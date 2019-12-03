@@ -1,3 +1,5 @@
+// Original work Copyright (c) 2018, InfluxData Inc.
+
 package legacysyslog
 
 import (
@@ -27,7 +29,7 @@ type syslogMessage struct {
 	priority          uint8
 
 	ciscoSequenceID string
-	timestamp       string
+	timestamp       time.Time
 	hostname        string
 	tag             string
 	content         string
@@ -61,10 +63,10 @@ func (sm *syslogMessage) export() *SyslogMessage {
 	if sm.ciscoSequenceIDSet {
 		out.ciscoSequenceID = &sm.ciscoSequenceID
 	}
-	// TODO:
-	// if sm.timestampSet {
-	// 	out.timestamp = &sm.timestamp
-	// }
+
+	if sm.timestampSet {
+		out.timestamp = &sm.timestamp
+	}
 	if sm.hostnameSet {
 		out.hostname = &sm.hostname
 	}

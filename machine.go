@@ -2,22 +2,25 @@
 package legacysyslog
 
 import (
+	"bytes"
 	"fmt"
+	"strconv"
+	"time"
 
 	"github.com/influxdata/go-syslog/v2/common"
 )
 
 var _ = fmt.Print
 
-//line machine.go.rl:175
+//line machine.go.rl:207
 
-//line machine.go:19
+//line machine.go:22
 const start int = 1
 const first_final int = 71
 
 const en_main int = 1
 
-//line machine.go.rl:178
+//line machine.go.rl:210
 
 type machine struct {
 	data       []byte
@@ -32,15 +35,15 @@ type machine struct {
 func NewMachine() *machine {
 	m := &machine{}
 
-//line machine.go.rl:193
+//line machine.go.rl:225
 
-//line machine.go.rl:194
+//line machine.go.rl:226
 
-//line machine.go.rl:195
+//line machine.go.rl:227
 
-//line machine.go.rl:196
+//line machine.go.rl:228
 
-//line machine.go.rl:197
+//line machine.go.rl:229
 
 	return m
 }
@@ -66,14 +69,14 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 
 	output := &syslogMessage{}
 
-//line machine.go:77
+//line machine.go:80
 	{
 		m.cs = start
 	}
 
-//line machine.go.rl:223
+//line machine.go.rl:255
 
-//line machine.go:84
+//line machine.go:87
 	{
 		if (m.p) == (m.pe) {
 			goto _test_eof
@@ -351,13 +354,13 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st0
 	tr6:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
 		goto st4
 	tr15:
-//line machine.go.rl:35
+//line machine.go.rl:38
 
 		switch m.data[m.p-1] {
 		case '.':
@@ -366,7 +369,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			output.ciscoTimestampExt = CiscoTimeClockModeUnsynced
 		}
 
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -376,7 +379,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof4
 		}
 	st_case_4:
-//line machine.go:387
+//line machine.go:390
 		switch (m.data)[(m.p)] {
 		case 112:
 			goto st5
@@ -570,12 +573,19 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st0
 	tr47:
-//line machine.go.rl:44
+//line machine.go.rl:59
 
-		output.timestampSet = true
-		output.timestamp += string(m.text())
+		{
+			output.timestampSet = true
+			t, err := time.Parse("Jan _2 2006 15:04:05", string(m.text()))
+			if err != nil {
+				m.err = err
+				return output.export(), m.err
+			}
+			output.timestamp = t
+		}
 
-//line machine.go.rl:104
+//line machine.go.rl:136
 		(m.p)--
 
 		goto st24
@@ -584,7 +594,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof24
 		}
 	st_case_24:
-//line machine.go:595
+//line machine.go:605
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr49
@@ -595,18 +605,25 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto tr48
 	tr48:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
 		goto st25
 	tr78:
-//line machine.go.rl:44
+//line machine.go.rl:47
 
-		output.timestampSet = true
-		output.timestamp += string(m.text())
+		{
+			output.timestampSet = true
+			t, err := time.Parse(time.Stamp, string(m.text()))
+			if err != nil {
+				m.err = err
+				return output.export(), m.err
+			}
+			output.timestamp = t
+		}
 
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -616,7 +633,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof25
 		}
 	st_case_25:
-//line machine.go:627
+//line machine.go:644
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr52
@@ -625,7 +642,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st25
 	tr52:
-//line machine.go.rl:53
+//line machine.go.rl:85
 
 		output.hostnameSet = true
 		output.hostname = string(m.text())
@@ -636,7 +653,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof26
 		}
 	st_case_26:
-//line machine.go:647
+//line machine.go:664
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr54
@@ -647,7 +664,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto tr53
 	tr53:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -657,7 +674,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof27
 		}
 	st_case_27:
-//line machine.go:668
+//line machine.go:685
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr58
@@ -668,36 +685,36 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st27
 	tr55:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
-//line machine.go.rl:58
+//line machine.go.rl:90
 
 		output.tagSet = true
 		output.tag = string(m.text())
 
 		goto st71
 	tr58:
-//line machine.go.rl:58
+//line machine.go.rl:90
 
 		output.tagSet = true
 		output.tag = string(m.text())
 
 		goto st71
 	tr61:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
-//line machine.go.rl:63
+//line machine.go.rl:95
 
 		output.contentSet = true
 		output.content = string(m.text())
 
 		goto st71
 	tr64:
-//line machine.go.rl:63
+//line machine.go.rl:95
 
 		output.contentSet = true
 		output.content = string(m.text())
@@ -708,13 +725,13 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof71
 		}
 	st_case_71:
-//line machine.go:719
+//line machine.go:736
 		if (m.data)[(m.p)] == 32 {
 			goto tr104
 		}
 		goto tr103
 	tr103:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -724,10 +741,10 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof72
 		}
 	st_case_72:
-//line machine.go:735
+//line machine.go:752
 		goto st72
 	tr104:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -737,21 +754,21 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof73
 		}
 	st_case_73:
-//line machine.go:748
+//line machine.go:765
 		goto tr103
 	tr56:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
-//line machine.go.rl:58
+//line machine.go.rl:90
 
 		output.tagSet = true
 		output.tag = string(m.text())
 
 		goto st28
 	tr59:
-//line machine.go.rl:58
+//line machine.go.rl:90
 
 		output.tagSet = true
 		output.tag = string(m.text())
@@ -762,7 +779,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof28
 		}
 	st_case_28:
-//line machine.go:773
+//line machine.go:790
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr61
@@ -773,7 +790,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto tr60
 	tr60:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -783,7 +800,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof29
 		}
 	st_case_29:
-//line machine.go:794
+//line machine.go:811
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr64
@@ -794,18 +811,18 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st29
 	tr62:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
-//line machine.go.rl:63
+//line machine.go.rl:95
 
 		output.contentSet = true
 		output.content = string(m.text())
 
 		goto st30
 	tr65:
-//line machine.go.rl:63
+//line machine.go.rl:95
 
 		output.contentSet = true
 		output.content = string(m.text())
@@ -816,7 +833,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof30
 		}
 	st_case_30:
-//line machine.go:827
+//line machine.go:844
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto st71
@@ -825,35 +842,35 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st0
 	tr54:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
-//line machine.go.rl:58
+//line machine.go.rl:90
 
 		output.tagSet = true
 		output.tag = string(m.text())
 
 		goto st74
 	tr71:
-//line machine.go.rl:53
+//line machine.go.rl:85
 
 		output.hostnameSet = true
 		output.hostname = string(m.text())
 
-//line machine.go.rl:58
+//line machine.go.rl:90
 
 		output.tagSet = true
 		output.tag = string(m.text())
 
 		goto st74
 	tr115:
-//line machine.go.rl:53
+//line machine.go.rl:85
 
 		output.hostnameSet = true
 		output.hostname = string(m.text())
 
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -863,7 +880,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof74
 		}
 	st_case_74:
-//line machine.go:874
+//line machine.go:891
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr54
@@ -874,7 +891,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto tr106
 	tr106:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -884,7 +901,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof75
 		}
 	st_case_75:
-//line machine.go:895
+//line machine.go:912
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr58
@@ -895,18 +912,18 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st75
 	tr107:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
-//line machine.go.rl:58
+//line machine.go.rl:90
 
 		output.tagSet = true
 		output.tag = string(m.text())
 
 		goto st76
 	tr109:
-//line machine.go.rl:58
+//line machine.go.rl:90
 
 		output.tagSet = true
 		output.tag = string(m.text())
@@ -917,7 +934,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof76
 		}
 	st_case_76:
-//line machine.go:928
+//line machine.go:945
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr61
@@ -928,7 +945,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto tr110
 	tr110:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -938,7 +955,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof77
 		}
 	st_case_77:
-//line machine.go:949
+//line machine.go:966
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr64
@@ -949,18 +966,18 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st77
 	tr111:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
-//line machine.go.rl:63
+//line machine.go.rl:95
 
 		output.contentSet = true
 		output.content = string(m.text())
 
 		goto st78
 	tr113:
-//line machine.go.rl:63
+//line machine.go.rl:95
 
 		output.contentSet = true
 		output.content = string(m.text())
@@ -971,7 +988,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof78
 		}
 	st_case_78:
-//line machine.go:982
+//line machine.go:999
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto st71
@@ -980,11 +997,11 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st72
 	tr49:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
-//line machine.go.rl:53
+//line machine.go.rl:85
 
 		output.hostnameSet = true
 		output.hostname = string(m.text())
@@ -995,7 +1012,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof31
 		}
 	st_case_31:
-//line machine.go:1006
+//line machine.go:1023
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr68
@@ -1006,7 +1023,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto tr67
 	tr67:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -1016,7 +1033,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof32
 		}
 	st_case_32:
-//line machine.go:1027
+//line machine.go:1044
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr71
@@ -1027,18 +1044,18 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st32
 	tr69:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
-//line machine.go.rl:58
+//line machine.go.rl:90
 
 		output.tagSet = true
 		output.tag = string(m.text())
 
 		goto st79
 	tr72:
-//line machine.go.rl:58
+//line machine.go.rl:90
 
 		output.tagSet = true
 		output.tag = string(m.text())
@@ -1049,7 +1066,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof79
 		}
 	st_case_79:
-//line machine.go:1060
+//line machine.go:1077
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr115
@@ -1058,7 +1075,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto tr114
 	tr114:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -1068,7 +1085,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof80
 		}
 	st_case_80:
-//line machine.go:1079
+//line machine.go:1096
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr117
@@ -1077,7 +1094,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st80
 	tr117:
-//line machine.go.rl:53
+//line machine.go.rl:85
 
 		output.hostnameSet = true
 		output.hostname = string(m.text())
@@ -1088,7 +1105,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof81
 		}
 	st_case_81:
-//line machine.go:1099
+//line machine.go:1116
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr54
@@ -1099,27 +1116,27 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto tr106
 	tr121:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
-//line machine.go.rl:53
+//line machine.go.rl:85
 
 		output.hostnameSet = true
 		output.hostname = string(m.text())
 
 		goto st82
 	tr68:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
-//line machine.go.rl:53
+//line machine.go.rl:85
 
 		output.hostnameSet = true
 		output.hostname = string(m.text())
 
-//line machine.go.rl:58
+//line machine.go.rl:90
 
 		output.tagSet = true
 		output.tag = string(m.text())
@@ -1130,7 +1147,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof82
 		}
 	st_case_82:
-//line machine.go:1141
+//line machine.go:1158
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr68
@@ -1141,7 +1158,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto tr118
 	tr118:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -1151,7 +1168,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof83
 		}
 	st_case_83:
-//line machine.go:1162
+//line machine.go:1179
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr71
@@ -1162,18 +1179,25 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st83
 	tr50:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
 		goto st33
 	tr80:
-//line machine.go.rl:44
+//line machine.go.rl:47
 
-		output.timestampSet = true
-		output.timestamp += string(m.text())
+		{
+			output.timestampSet = true
+			t, err := time.Parse(time.Stamp, string(m.text()))
+			if err != nil {
+				m.err = err
+				return output.export(), m.err
+			}
+			output.timestamp = t
+		}
 
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -1183,7 +1207,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof33
 		}
 	st_case_33:
-//line machine.go:1194
+//line machine.go:1218
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr49
@@ -1251,16 +1275,23 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto tr78
 	tr79:
-//line machine.go.rl:44
+//line machine.go.rl:47
 
-		output.timestampSet = true
-		output.timestamp += string(m.text())
+		{
+			output.timestampSet = true
+			t, err := time.Parse(time.Stamp, string(m.text()))
+			if err != nil {
+				m.err = err
+				return output.export(), m.err
+			}
+			output.timestamp = t
+		}
 
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
-//line machine.go.rl:53
+//line machine.go.rl:85
 
 		output.hostnameSet = true
 		output.hostname = string(m.text())
@@ -1271,7 +1302,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof40
 		}
 	st_case_40:
-//line machine.go:1282
+//line machine.go:1313
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr68
@@ -1285,7 +1316,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto tr67
 	tr81:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -1295,7 +1326,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof41
 		}
 	st_case_41:
-//line machine.go:1306
+//line machine.go:1337
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr71
@@ -1357,19 +1388,29 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st32
 	tr85:
-//line machine.go.rl:49
+//line machine.go.rl:71
 
-		output.timestamp += " " + string(m.text())
+		{
+			yearRaw := bytes.Trim(m.text(), " ")
+			year, err := strconv.Atoi(string(yearRaw))
+			if err != nil {
+				m.err = err
+				return output.export(), m.err
+			}
+			// Date(year int, month Month, day, hour, min, sec, nsec int, loc *Location) Time
+			t := output.timestamp.UTC()
+			output.timestamp = time.Date(year, t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), time.UTC)
+		}
 
-//line machine.go.rl:115
+//line machine.go.rl:147
 		(m.p)--
 
-//line machine.go.rl:53
+//line machine.go.rl:85
 
 		output.hostnameSet = true
 		output.hostname = string(m.text())
 
-//line machine.go.rl:58
+//line machine.go.rl:90
 
 		output.tagSet = true
 		output.tag = string(m.text())
@@ -1380,7 +1421,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof84
 		}
 	st_case_84:
-//line machine.go:1391
+//line machine.go:1432
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr68
@@ -1391,11 +1432,11 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto tr118
 	tr120:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
-//line machine.go.rl:58
+//line machine.go.rl:90
 
 		output.tagSet = true
 		output.tag = string(m.text())
@@ -1406,7 +1447,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof85
 		}
 	st_case_85:
-//line machine.go:1417
+//line machine.go:1458
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr121
@@ -1442,13 +1483,13 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st0
 	tr7:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
 		goto st48
 	tr16:
-//line machine.go.rl:35
+//line machine.go.rl:38
 
 		switch m.data[m.p-1] {
 		case '.':
@@ -1457,7 +1498,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			output.ciscoTimestampExt = CiscoTimeClockModeUnsynced
 		}
 
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -1467,7 +1508,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof48
 		}
 	st_case_48:
-//line machine.go:1478
+//line machine.go:1519
 		if (m.data)[(m.p)] == 101 {
 			goto st49
 		}
@@ -1482,13 +1523,13 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st0
 	tr8:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
 		goto st50
 	tr17:
-//line machine.go.rl:35
+//line machine.go.rl:38
 
 		switch m.data[m.p-1] {
 		case '.':
@@ -1497,7 +1538,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			output.ciscoTimestampExt = CiscoTimeClockModeUnsynced
 		}
 
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -1507,7 +1548,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof50
 		}
 	st_case_50:
-//line machine.go:1518
+//line machine.go:1559
 		if (m.data)[(m.p)] == 101 {
 			goto st51
 		}
@@ -1522,13 +1563,13 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st0
 	tr9:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
 		goto st52
 	tr18:
-//line machine.go.rl:35
+//line machine.go.rl:38
 
 		switch m.data[m.p-1] {
 		case '.':
@@ -1537,7 +1578,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			output.ciscoTimestampExt = CiscoTimeClockModeUnsynced
 		}
 
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -1547,7 +1588,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof52
 		}
 	st_case_52:
-//line machine.go:1558
+//line machine.go:1599
 		switch (m.data)[(m.p)] {
 		case 97:
 			goto st53
@@ -1577,13 +1618,13 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st0
 	tr10:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
 		goto st55
 	tr19:
-//line machine.go.rl:35
+//line machine.go.rl:38
 
 		switch m.data[m.p-1] {
 		case '.':
@@ -1592,7 +1633,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			output.ciscoTimestampExt = CiscoTimeClockModeUnsynced
 		}
 
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -1602,7 +1643,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof55
 		}
 	st_case_55:
-//line machine.go:1613
+//line machine.go:1654
 		if (m.data)[(m.p)] == 97 {
 			goto st56
 		}
@@ -1620,13 +1661,13 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st0
 	tr11:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
 		goto st57
 	tr20:
-//line machine.go.rl:35
+//line machine.go.rl:38
 
 		switch m.data[m.p-1] {
 		case '.':
@@ -1635,7 +1676,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			output.ciscoTimestampExt = CiscoTimeClockModeUnsynced
 		}
 
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -1645,7 +1686,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof57
 		}
 	st_case_57:
-//line machine.go:1656
+//line machine.go:1697
 		if (m.data)[(m.p)] == 111 {
 			goto st58
 		}
@@ -1660,13 +1701,13 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st0
 	tr12:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
 		goto st59
 	tr21:
-//line machine.go.rl:35
+//line machine.go.rl:38
 
 		switch m.data[m.p-1] {
 		case '.':
@@ -1675,7 +1716,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			output.ciscoTimestampExt = CiscoTimeClockModeUnsynced
 		}
 
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -1685,7 +1726,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof59
 		}
 	st_case_59:
-//line machine.go:1696
+//line machine.go:1737
 		if (m.data)[(m.p)] == 99 {
 			goto st60
 		}
@@ -1700,13 +1741,13 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st0
 	tr13:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
 		goto st61
 	tr22:
-//line machine.go.rl:35
+//line machine.go.rl:38
 
 		switch m.data[m.p-1] {
 		case '.':
@@ -1715,7 +1756,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			output.ciscoTimestampExt = CiscoTimeClockModeUnsynced
 		}
 
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -1725,7 +1766,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof61
 		}
 	st_case_61:
-//line machine.go:1736
+//line machine.go:1777
 		if (m.data)[(m.p)] == 101 {
 			goto st62
 		}
@@ -1740,7 +1781,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st0
 	tr23:
-//line machine.go.rl:35
+//line machine.go.rl:38
 
 		switch m.data[m.p-1] {
 		case '.':
@@ -1755,7 +1796,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof63
 		}
 	st_case_63:
-//line machine.go:1766
+//line machine.go:1807
 		if (m.data)[(m.p)] == 79 {
 			goto st64
 		}
@@ -1779,7 +1820,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st0
 	tr3:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -1789,7 +1830,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof66
 		}
 	st_case_66:
-//line machine.go:1800
+//line machine.go:1841
 		if (m.data)[(m.p)] == 58 {
 			goto tr98
 		}
@@ -1798,18 +1839,18 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st0
 	tr4:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
-//line machine.go.rl:30
+//line machine.go.rl:33
 
 		output.ciscoSequenceIDSet = true
 		output.ciscoSequenceID = string(m.text())
 
 		goto st67
 	tr98:
-//line machine.go.rl:30
+//line machine.go.rl:33
 
 		output.ciscoSequenceIDSet = true
 		output.ciscoSequenceID = string(m.text())
@@ -1820,7 +1861,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof67
 		}
 	st_case_67:
-//line machine.go:1831
+//line machine.go:1872
 		if (m.data)[(m.p)] == 32 {
 			goto st2
 		}
@@ -1838,7 +1879,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st0
 	tr99:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
@@ -1848,7 +1889,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof69
 		}
 	st_case_69:
-//line machine.go:1859
+//line machine.go:1900
 		if (m.data)[(m.p)] == 62 {
 			goto tr102
 		}
@@ -1857,18 +1898,18 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 		goto st0
 	tr100:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 		m.pb = m.p
 
-//line machine.go.rl:25
+//line machine.go.rl:28
 
 		output.priority = uint8(common.UnsafeUTF8DecimalCodePointsToInt(m.text()))
 		output.prioritySet = true
 
 		goto st70
 	tr102:
-//line machine.go.rl:25
+//line machine.go.rl:28
 
 		output.priority = uint8(common.UnsafeUTF8DecimalCodePointsToInt(m.text()))
 		output.prioritySet = true
@@ -1879,7 +1920,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof70
 		}
 	st_case_70:
-//line machine.go:1890
+//line machine.go:1931
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto st2
@@ -2172,22 +2213,22 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		if (m.p) == (m.eof) {
 			switch m.cs {
 			case 72, 75, 76, 77, 78, 80, 81, 83:
-//line machine.go.rl:68
+//line machine.go.rl:100
 
 				output.messageSet = true
 				output.message = string(m.text())
 
 			case 71, 73, 74, 79, 82, 84, 85:
-//line machine.go.rl:17
+//line machine.go.rl:20
 
 				m.pb = m.p
 
-//line machine.go.rl:68
+//line machine.go.rl:100
 
 				output.messageSet = true
 				output.message = string(m.text())
 
-//line machine.go:2028
+//line machine.go:2069
 			}
 		}
 
@@ -2196,7 +2237,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 		}
 	}
 
-//line machine.go.rl:224
+//line machine.go.rl:256
 
 	return output.export(), m.err
 }
