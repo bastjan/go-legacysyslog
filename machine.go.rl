@@ -22,8 +22,8 @@ action mark {
 	m.pb = m.p
 }
 
-action print {
-	fmt.Println("Val: ", string(m.text()))
+action mark_hostname {
+	m.pHostname = m.p
 }
 
 action set_priority {
@@ -97,7 +97,7 @@ action append_linksys_year {
 
 action set_hostname {
 	output.hostnameSet = true
-	output.hostname = string(m.text())
+	output.hostname = string(m.data[m.pHostname:m.p])
 }
 
 action set_tag {
@@ -171,10 +171,12 @@ timestamp =
 	':'?
 	;
 
+# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L401
+ipv6heuristic = (xdigit{0,4} ':'){1,7} xdigit{1,4};
+
 # https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L456
-# TODO: ipv6 heuristics
 # TODO: check hostname and badhostname options
-hostname = (any - [\[ ])* >mark %set_hostname ' ';
+hostname = ( (any - [\[ :])+ | ipv6heuristic) >mark_hostname %set_hostname ' ';
 
 # https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L315
 tag = (any - [\[: ])* >mark %set_tag;
@@ -205,7 +207,7 @@ main :=
 	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L775
 	' '*
 	# TODO: last message repeated / forwarded from
-	hostname
+	hostname?
 	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L804
 	' '*
 	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L808
@@ -225,7 +227,12 @@ type machine struct {
 	data         []byte
 	cs           int
 	p, pe, eof   int
+	// general mark
 	pb           int
+	// hostname machine can run in parallel to the tag machine since it is not clear from the beginning
+	// if it is a hostname or tag
+	pHostname int
+
 	err          error
 	bestEffort   bool
 }
@@ -258,6 +265,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 	m.data = input
 	m.p = 0
 	m.pb = 0
+	m.pHostname = 0
 	m.pe = len(input)
 	m.eof = len(input)
 	m.err = nil

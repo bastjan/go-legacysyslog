@@ -46,6 +46,73 @@ var tests = []testCase{
 		},
 	},
 	testCase{
+		description: "RFC3164 no host",
+		line:        `<13>Dec  1 09:15:22 root: yolo`,
+		expected: &SyslogMessage{
+			priority:  uint8Addr(13),
+			facility:  uint8Addr(1),
+			severity:  uint8Addr(5),
+			timestamp: timeAddr(time.Stamp, "Dec  1 09:15:22"),
+			tag:       stringAddr("root"),
+			message:   stringAddr("yolo"),
+		},
+	},
+
+	testCase{
+		description: "RFC3164 IPv4 host",
+		line:        `<13>Dec  1 09:15:22 10.77.0.1 root: yolo`,
+		expected: &SyslogMessage{
+			priority:  uint8Addr(13),
+			facility:  uint8Addr(1),
+			severity:  uint8Addr(5),
+			timestamp: timeAddr(time.Stamp, "Dec  1 09:15:22"),
+			hostname:  stringAddr("10.77.0.1"),
+			tag:       stringAddr("root"),
+			message:   stringAddr("yolo"),
+		},
+	},
+
+	testCase{
+		description: "RFC3164 IPv6 host",
+		line:        `<13>Dec  1 09:15:22 2001:db8::8a2e:370:7334 root: yolo`,
+		expected: &SyslogMessage{
+			priority:  uint8Addr(13),
+			facility:  uint8Addr(1),
+			severity:  uint8Addr(5),
+			timestamp: timeAddr(time.Stamp, "Dec  1 09:15:22"),
+			hostname:  stringAddr("2001:db8::8a2e:370:7334"),
+			tag:       stringAddr("root"),
+			message:   stringAddr("yolo"),
+		},
+	},
+	testCase{
+		description: "RFC3164 IPv6 host",
+		line:        `<13>Dec  1 09:15:22 2001:0db8:0000:0000:0000:8a2e:0370:7334 root: yolo`,
+		expected: &SyslogMessage{
+			priority:  uint8Addr(13),
+			facility:  uint8Addr(1),
+			severity:  uint8Addr(5),
+			timestamp: timeAddr(time.Stamp, "Dec  1 09:15:22"),
+			hostname:  stringAddr("2001:0db8:0000:0000:0000:8a2e:0370:7334"),
+			tag:       stringAddr("root"),
+			message:   stringAddr("yolo"),
+		},
+	},
+	testCase{
+		description: "RFC3164 IPv6 host",
+		line:        `<13>Dec  1 09:15:22 ::1 root: yolo`,
+		expected: &SyslogMessage{
+			priority:  uint8Addr(13),
+			facility:  uint8Addr(1),
+			severity:  uint8Addr(5),
+			timestamp: timeAddr(time.Stamp, "Dec  1 09:15:22"),
+			hostname:  stringAddr("::1"),
+			tag:       stringAddr("root"),
+			message:   stringAddr("yolo"),
+		},
+	},
+
+	testCase{
 		description: "RFC3164 space between priority and date",
 		line:        `<13> Dec  1 09:15:22 0304eebf3c1e root[3037]: yolo`,
 		expected: &SyslogMessage{
@@ -153,6 +220,31 @@ var tests = []testCase{
 			message:           stringAddr("yolo"),
 		},
 	},
+
+	testCase{
+		description: "PulseSecure",
+		line:        `<142> 2017-12-05T16:03:37+01:00  PulseSecure: 2017-12-05 16:03:37 - sslvpn01 - [87.245.121.26] xxx(VER-SMS)[] - Secondary authentication`,
+		expected: &SyslogMessage{
+			priority:  uint8Addr(142),
+			facility:  uint8Addr(17),
+			severity:  uint8Addr(6),
+			timestamp: timeAddr(time.RFC3339Nano, "2017-12-05T16:03:37+01:00"),
+			tag:       stringAddr("PulseSecure"),
+			message:   stringAddr("2017-12-05 16:03:37 - sslvpn01 - [87.245.121.26] xxx(VER-SMS)[] - Secondary authentication"),
+		},
+	},
+
+	// testCase{
+	// 	description: "Citrix Netscaler (does not work in syslog-ng) tested here to ensure parsing is the same as in syslog-ng",
+	// 	line:        `<134> 11/28/2019:15:31:21 GMT netscaler1 0-PPE-0 : default TCP CONN_TERMINATE 17000000 0 :  Source 127.0.0.1:80 - Destination 127.0.0.1:25963 - Start Time 11/28/2019:15:30:06 GMT - End Time 11/28/2019:15:31:21 GMT - Total_bytes_send 1 - Total_bytes_recv 1`,
+	// 	expected: &SyslogMessage{
+	// 		priority: uint8Addr(134),
+	// 		facility: uint8Addr(16),
+	// 		severity: uint8Addr(6),
+	// 		tag:      stringAddr("11/28/2019"),
+	// 		message:  stringAddr("15:31:21 GMT netscaler1 0-PPE-0 : default TCP CONN_TERMINATE 17000000 0 :  Source 127.0.0.1:80 - Destination 127.0.0.1:25963 - Start Time 11/28/2019:15:30:06 GMT - End Time 11/28/2019:15:31:21 GMT - Total_bytes_send 1 - Total_bytes_recv 1"),
+	// 	},
+	// },
 }
 
 func TestMachineParse(t *testing.T) {
@@ -162,7 +254,6 @@ func TestMachineParse(t *testing.T) {
 		fmt.Println("TestCase:", test.description)
 		t.Log("TestCase:", test.description)
 		msg, err := m.Parse([]byte(test.line))
-		t.Logf("Output: %+v", msg)
 		if err != nil {
 			t.Error("Test failed:", err)
 		}
