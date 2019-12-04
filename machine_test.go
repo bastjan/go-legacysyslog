@@ -234,17 +234,26 @@ var tests = []testCase{
 		},
 	},
 
-	// testCase{
-	// 	description: "Citrix Netscaler (does not work in syslog-ng) tested here to ensure parsing is the same as in syslog-ng",
-	// 	line:        `<134> 11/28/2019:15:31:21 GMT netscaler1 0-PPE-0 : default TCP CONN_TERMINATE 17000000 0 :  Source 127.0.0.1:80 - Destination 127.0.0.1:25963 - Start Time 11/28/2019:15:30:06 GMT - End Time 11/28/2019:15:31:21 GMT - Total_bytes_send 1 - Total_bytes_recv 1`,
-	// 	expected: &SyslogMessage{
-	// 		priority: uint8Addr(134),
-	// 		facility: uint8Addr(16),
-	// 		severity: uint8Addr(6),
-	// 		tag:      stringAddr("11/28/2019"),
-	// 		message:  stringAddr("15:31:21 GMT netscaler1 0-PPE-0 : default TCP CONN_TERMINATE 17000000 0 :  Source 127.0.0.1:80 - Destination 127.0.0.1:25963 - Start Time 11/28/2019:15:30:06 GMT - End Time 11/28/2019:15:31:21 GMT - Total_bytes_send 1 - Total_bytes_recv 1"),
-	// 	},
-	// },
+	testCase{
+		description: "Seen from Symantec BlueCoat webproxy but configurable - no header at all",
+		line:        `ProxyTest: Received:5 Sent:5`,
+		expected: &SyslogMessage{
+			tag:     stringAddr("ProxyTest"),
+			message: stringAddr("Received:5 Sent:5"),
+		},
+	},
+
+	testCase{
+		description: "Citrix Netscaler (does not work in syslog-ng) tested here to ensure parsing is the same as in syslog-ng",
+		line:        `<134> 11/28/2019:15:31:21 GMT netscaler1 0-PPE-0 : default TCP CONN_TERMINATE 17000000 0 :  Source 127.0.0.1:80 - Destination 127.0.0.1:25963 - Start Time 11/28/2019:15:30:06 GMT - End Time 11/28/2019:15:31:21 GMT - Total_bytes_send 1 - Total_bytes_recv 1`,
+		expected: &SyslogMessage{
+			priority: uint8Addr(134),
+			facility: uint8Addr(16),
+			severity: uint8Addr(6),
+			tag:      stringAddr("11/28/2019"),
+			message:  stringAddr("15:31:21 GMT netscaler1 0-PPE-0 : default TCP CONN_TERMINATE 17000000 0 :  Source 127.0.0.1:80 - Destination 127.0.0.1:25963 - Start Time 11/28/2019:15:30:06 GMT - End Time 11/28/2019:15:31:21 GMT - Total_bytes_send 1 - Total_bytes_recv 1"),
+		},
+	},
 }
 
 func TestMachineParse(t *testing.T) {
