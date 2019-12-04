@@ -13,6 +13,7 @@ var _ = fmt.Print
 
 %%{
 machine legacysyslog;
+include iso_timestamp "iso_timestamp.rl";
 
 # unsigned alphabet
 alphtype uint8;
@@ -44,26 +45,38 @@ action set_cisco_timestamp_ext {
 	}
 }
 
+action set_iso_timestamp {
+	{
+		t, err := time.Parse("2006-01-02T15:04:05.999999Z07:00", string(m.text()))
+		if err != nil {
+			m.err = err
+			return output.export(), m.err
+		}
+		output.timestampSet = true
+		output.timestamp = t
+	}
+}
+
 action set_bsd_timestamp {
 	{
-		output.timestampSet = true
 		t, err := time.Parse(time.Stamp, string(m.text()))
 		if err != nil {
 			m.err = err
 			return output.export(), m.err
 		}
+		output.timestampSet = true
 		output.timestamp = t
 	}
 }
 
 action set_cisco_timestamp {
 	{
-		output.timestampSet = true
 		t, err := time.Parse("Jan _2 2006 15:04:05", string(m.text()))
 		if err != nil {
 			m.err = err
 			return output.export(), m.err
 		}
+		output.timestampSet = true
 		output.timestamp = t
 	}
 }
@@ -149,7 +162,7 @@ linksys_timestamp =
 # https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L391
 rfc3164_stamp = (cisco_timestamp | linksys_timestamp | bsd_stamp );
 
-iso_stamp = 'TODO';
+iso_stamp = iso_timestamp >mark %set_iso_timestamp;
 
 # https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L426
 timestamp = 

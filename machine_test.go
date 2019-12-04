@@ -102,6 +102,46 @@ var tests = []testCase{
 	},
 
 	testCase{
+		description: "RFC3164 ISO Timestamp",
+		line:        `<13>2019-12-04T09:55:56+01:00 0304eebf3c1e root: yolo`,
+		expected: &SyslogMessage{
+			priority:  uint8Addr(13),
+			facility:  uint8Addr(1),
+			severity:  uint8Addr(5),
+			timestamp: timeAddr(time.RFC3339, "2019-12-04T09:55:56+01:00"),
+			hostname:  stringAddr("0304eebf3c1e"),
+			tag:       stringAddr("root"),
+			message:   stringAddr("yolo"),
+		},
+	},
+	testCase{
+		description: "RFC3164 ISO Timestamp",
+		line:        `<13>2019-12-04T09:55:56Z 0304eebf3c1e root: yolo`,
+		expected: &SyslogMessage{
+			priority:  uint8Addr(13),
+			facility:  uint8Addr(1),
+			severity:  uint8Addr(5),
+			timestamp: timeAddr(time.RFC3339, "2019-12-04T09:55:56Z"),
+			hostname:  stringAddr("0304eebf3c1e"),
+			tag:       stringAddr("root"),
+			message:   stringAddr("yolo"),
+		},
+	},
+	testCase{
+		description: "RFC3164 ISO Timestamp",
+		line:        `<13>2019-12-04T09:55:56.234Z 0304eebf3c1e root: yolo`,
+		expected: &SyslogMessage{
+			priority:  uint8Addr(13),
+			facility:  uint8Addr(1),
+			severity:  uint8Addr(5),
+			timestamp: timeAddr(time.RFC3339Nano, "2019-12-04T09:55:56.234Z"),
+			hostname:  stringAddr("0304eebf3c1e"),
+			tag:       stringAddr("root"),
+			message:   stringAddr("yolo"),
+		},
+	},
+
+	testCase{
 		description: "Cisco Sequence ID",
 		line:        `000123: *Dec  1 09:15:22: 0304eebf3c1e root: yolo`,
 		expected: &SyslogMessage{
