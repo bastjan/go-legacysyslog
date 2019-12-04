@@ -26,6 +26,10 @@ action mark_hostname {
 	m.pHostname = m.p
 }
 
+action mark_timestamp {
+	m.pTimestamp = m.p
+}
+
 action set_priority {
 	output.priority = uint8(common.UnsafeUTF8DecimalCodePointsToInt(m.text()))
 	output.prioritySet = true
@@ -47,7 +51,7 @@ action set_cisco_timestamp_ext {
 
 action set_iso_timestamp {
 	{
-		t, err := time.Parse("2006-01-02T15:04:05.999999Z07:00", string(m.text()))
+		t, err := time.Parse("2006-01-02T15:04:05.999999Z07:00", string(m.data[m.pTimestamp:m.p]))
 		if err != nil {
 			m.err = err
 			return output.export(), m.err
@@ -59,7 +63,7 @@ action set_iso_timestamp {
 
 action set_bsd_timestamp {
 	{
-		t, err := time.Parse(time.Stamp, string(m.text()))
+		t, err := time.Parse(time.Stamp, string(m.data[m.pTimestamp:m.p]))
 		if err != nil {
 			m.err = err
 			return output.export(), m.err
@@ -71,7 +75,7 @@ action set_bsd_timestamp {
 
 action set_cisco_timestamp {
 	{
-		t, err := time.Parse("Jan _2 2006 15:04:05", string(m.text()))
+		t, err := time.Parse("Jan _2 2006 15:04:05", string(m.data[m.pTimestamp:m.p]))
 		if err != nil {
 			m.err = err
 			return output.export(), m.err
@@ -144,13 +148,13 @@ hhmmss = digit{2} ':' digit{2} ':' digit{2};
 
 cisco_timestamp =
 	# https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L220
-	(month_abrev ' ' bsd_day ' ' digit{4} ' ' hhmmss) >mark %set_cisco_timestamp
+	(month_abrev ' ' bsd_day ' ' digit{4} ' ' hhmmss) >mark_timestamp %set_cisco_timestamp
 	# https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L211
 	[: ] >{ fhold; }
 	;
 
 # https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L145
-bsd_stamp = (month_abrev ' ' bsd_day ' ' hhmmss) >mark %set_bsd_timestamp;
+bsd_stamp = (month_abrev ' ' bsd_day ' ' hhmmss) >mark_timestamp %set_bsd_timestamp;
 
 # https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L261
 linksys_timestamp =
@@ -162,7 +166,7 @@ linksys_timestamp =
 # https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L391
 rfc3164_stamp = (cisco_timestamp | linksys_timestamp | bsd_stamp );
 
-iso_stamp = iso_timestamp >mark %set_iso_timestamp;
+iso_stamp = iso_timestamp >mark_timestamp %set_iso_timestamp;
 
 # https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L426
 timestamp = 
@@ -202,15 +206,16 @@ main :=
 	cisco_timestamp_attributes?
 
 	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L767
-	# TODO: no timestamp case
-	timestamp
-	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L775
-	' '*
-	# TODO: last message repeated / forwarded from
-	hostname?
-	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L804
-	' '*
-	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L808
+	(	timestamp
+		# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L775
+		' '*
+		# TODO: last message repeated / forwarded from
+		hostname?
+		# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L804
+		' '*
+		# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L808
+	)?
+
 	tag_optional_content
 
 	# TODO validate utf8 option
@@ -232,6 +237,8 @@ type machine struct {
 	// hostname machine can run in parallel to the tag machine since it is not clear from the beginning
 	// if it is a hostname or tag
 	pHostname int
+	// same for the timestamp
+	pTimestamp int
 
 	err          error
 	bestEffort   bool
@@ -266,6 +273,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 	m.p = 0
 	m.pb = 0
 	m.pHostname = 0
+	m.pTimestamp = 0
 	m.pe = len(input)
 	m.eof = len(input)
 	m.err = nil
