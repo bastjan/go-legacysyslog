@@ -193,7 +193,7 @@ content =
 	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L342
 	']'? ;
 
-tag_optional_content = tag content? [: ] ' '?;
+tag_optional_content = tag %/set_tag content? [: ] ' '?;
 
 main := 
 	# https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L757
@@ -269,6 +269,10 @@ func (m *machine) text() []byte {
 
 // Parse parses the input byte array as a RFC3164 syslog message.
 func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
+	if len(input) == 0 {
+		return (&syslogMessage{}).export(), nil
+	}
+
 	m.data = input
 	m.p = 0
 	m.pb = 0

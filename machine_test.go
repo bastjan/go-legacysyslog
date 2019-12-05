@@ -257,6 +257,48 @@ var tests = []testCase{
 			message: stringAddr("Received:5 Sent:5"),
 		},
 	},
+	testCase{
+		description: "Message only (syslog-ng uses the first word as tag)",
+		line:        `I like trains.`,
+		expected: &SyslogMessage{
+			tag:     stringAddr("I"),
+			message: stringAddr("like trains."),
+		},
+	},
+	testCase{
+		description: "Message only (syslog-ng uses the first word as tag)",
+		line:        `I like: trains.`,
+		expected: &SyslogMessage{
+			tag:     stringAddr("I"),
+			message: stringAddr("like: trains."),
+		},
+	},
+	testCase{
+		description: "One word (syslog-ng uses the first word as tag)",
+		line:        `test`,
+		expected: &SyslogMessage{
+			tag: stringAddr("test"),
+		},
+	},
+	testCase{
+		description: "One word with '[' content mark (syslog-ng uses the first word as tag)",
+		line:        `test[`,
+		expected: &SyslogMessage{
+			tag: stringAddr("test"),
+		},
+	},
+	testCase{
+		description: "One word with '[234' content mark (syslog-ng uses the first word as tag)",
+		line:        `test[234`,
+		expected: &SyslogMessage{
+			tag: stringAddr("test"),
+		},
+	},
+	testCase{
+		description: "Empty",
+		line:        ``,
+		expected:    &SyslogMessage{},
+	},
 
 	testCase{
 		description: "Citrix Netscaler (does not work in syslog-ng) tested here to ensure parsing is the same as in syslog-ng",
