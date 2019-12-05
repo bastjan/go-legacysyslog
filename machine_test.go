@@ -295,3 +295,17 @@ func TestWriteFuzzerCorpus(t *testing.T) {
 		require.NoError(t, err)
 	}
 }
+
+var benchres *SyslogMessage
+
+func BenchmarkParseStandardMessage(b *testing.B) {
+	m := NewMachine()
+
+	line := []byte(`<13>Dec  1 09:15:22 0304eebf3c1e root[3037]: yolo`)
+
+	b.ResetTimer()
+
+	for n := 0; n < b.N; n++ {
+		benchres, _ = m.Parse(line)
+	}
+}
