@@ -289,7 +289,7 @@ func TestWriteFuzzerCorpus(t *testing.T) {
 	require.NoError(t, err)
 
 	for _, test := range tests {
-		name := url.QueryEscape(test.description) + ".inital"
+		name := url.QueryEscape(test.description) + ".from_test"
 		path := filepath.Join("corpus", name)
 		err := ioutil.WriteFile(path, []byte(test.line), 0666)
 		require.NoError(t, err)
