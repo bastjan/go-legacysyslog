@@ -140,8 +140,8 @@ cisco_sequence_id = digit* >mark %set_cisco_sequence_id ': ';
 # https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L214
 cisco_timestamp_attributes = [*.] %set_cisco_timestamp_ext;
 
-# TODO: Case insensitive 
-month_abrev = ('Jan' | 'Feb' | 'Mar' | 'Apr' | 'May' | 'Jun' | 'Jul' | 'Aug' | 'Sep' | 'Oct' | 'Nov' | 'Dec');
+# https://github.com/syslog-ng/syslog-ng/blob/eedebbfd3fc9d14389abf53c7efead1ecfea8d12/lib/timeutils/scan-timestamp.c#L76
+month_abrev = ('J' /an/i | 'F' /eb/i | 'M' /ar/i | 'A' /pr/i | 'M' /ay/i | 'J' /un/i | 'J' /ul/i | 'A' /ug/i | 'S' /ep/i | 'O' /ct/i | 'N' /ov/i | 'D' /ec/i);
 bsd_day = ([0 ] . '1'..'9' | '1'..'2' . '0'..'9' | '3' . '0'..'1');
 # TODO: syslog-ng actually allows space instead of 0
 hhmmss = digit{2} ':' digit{2} ':' digit{2};

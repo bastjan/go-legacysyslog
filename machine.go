@@ -2829,6 +2829,10 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 80:
+			goto st141
+		case 85:
+			goto st176
 		case 91:
 			goto tr93
 		case 112:
@@ -2847,6 +2851,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 82:
+			goto st142
 		case 91:
 			goto tr93
 		case 114:
@@ -2879,7 +2885,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof143
 		}
 	st_case_143:
-//line machine.go:2890
+//line machine.go:2896
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr199
@@ -2903,7 +2909,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof144
 		}
 	st_case_144:
-//line machine.go:2914
+//line machine.go:2920
 		if 49 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 57 {
 			goto tr203
 		}
@@ -2919,7 +2925,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof145
 		}
 	st_case_145:
-//line machine.go:2930
+//line machine.go:2936
 		if (m.data)[(m.p)] == 32 {
 			goto st146
 		}
@@ -3078,7 +3084,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof160
 		}
 	st_case_160:
-//line machine.go:3089
+//line machine.go:3095
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr147
@@ -3199,7 +3205,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof167
 		}
 	st_case_167:
-//line machine.go:3210
+//line machine.go:3216
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr147
@@ -3236,7 +3242,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof168
 		}
 	st_case_168:
-//line machine.go:3247
+//line machine.go:3253
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr144
@@ -3358,7 +3364,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof172
 		}
 	st_case_172:
-//line machine.go:3369
+//line machine.go:3375
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr147
@@ -3391,7 +3397,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof173
 		}
 	st_case_173:
-//line machine.go:3402
+//line machine.go:3408
 		if 49 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 57 {
 			goto st145
 		}
@@ -3407,7 +3413,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof174
 		}
 	st_case_174:
-//line machine.go:3418
+//line machine.go:3424
 		if 48 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 57 {
 			goto st145
 		}
@@ -3423,7 +3429,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof175
 		}
 	st_case_175:
-//line machine.go:3434
+//line machine.go:3440
 		if 48 <= (m.data)[(m.p)] && (m.data)[(m.p)] <= 49 {
 			goto st145
 		}
@@ -3438,6 +3444,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 71:
+			goto st142
 		case 91:
 			goto tr93
 		case 103:
@@ -3478,12 +3486,14 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof177
 		}
 	st_case_177:
-//line machine.go:3489
+//line machine.go:3497
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
 		case 58:
 			goto tr16
+		case 69:
+			goto st178
 		case 91:
 			goto tr93
 		case 101:
@@ -3500,6 +3510,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 67:
+			goto st142
 		case 91:
 			goto tr93
 		case 99:
@@ -3540,12 +3552,14 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof179
 		}
 	st_case_179:
-//line machine.go:3551
+//line machine.go:3563
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
 		case 58:
 			goto tr16
+		case 69:
+			goto st180
 		case 91:
 			goto tr93
 		case 101:
@@ -3562,6 +3576,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 66:
+			goto st142
 		case 91:
 			goto tr93
 		case 98:
@@ -3602,12 +3618,16 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof181
 		}
 	st_case_181:
-//line machine.go:3613
+//line machine.go:3629
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
 		case 58:
 			goto tr16
+		case 65:
+			goto st182
+		case 85:
+			goto st183
 		case 91:
 			goto tr93
 		case 97:
@@ -3626,6 +3646,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 78:
+			goto st142
 		case 91:
 			goto tr93
 		case 110:
@@ -3642,6 +3664,10 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 76:
+			goto st142
+		case 78:
+			goto st142
 		case 91:
 			goto tr93
 		case 108:
@@ -3684,12 +3710,14 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof184
 		}
 	st_case_184:
-//line machine.go:3695
+//line machine.go:3721
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
 		case 58:
 			goto tr16
+		case 65:
+			goto st185
 		case 91:
 			goto tr93
 		case 97:
@@ -3706,6 +3734,10 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 82:
+			goto st142
+		case 89:
+			goto st142
 		case 91:
 			goto tr93
 		case 114:
@@ -3748,12 +3780,14 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof186
 		}
 	st_case_186:
-//line machine.go:3759
+//line machine.go:3791
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
 		case 58:
 			goto tr16
+		case 79:
+			goto st187
 		case 91:
 			goto tr93
 		case 111:
@@ -3770,6 +3804,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 86:
+			goto st142
 		case 91:
 			goto tr93
 		case 118:
@@ -3810,12 +3846,14 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof188
 		}
 	st_case_188:
-//line machine.go:3821
+//line machine.go:3857
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
 		case 58:
 			goto tr16
+		case 67:
+			goto st189
 		case 91:
 			goto tr93
 		case 99:
@@ -3832,6 +3870,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 84:
+			goto st142
 		case 91:
 			goto tr93
 		case 116:
@@ -3872,12 +3912,14 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof190
 		}
 	st_case_190:
-//line machine.go:3883
+//line machine.go:3923
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
 		case 58:
 			goto tr16
+		case 69:
+			goto st191
 		case 91:
 			goto tr93
 		case 101:
@@ -3894,6 +3936,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 80:
+			goto st142
 		case 91:
 			goto tr93
 		case 112:
@@ -3911,7 +3955,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof6
 		}
 	st_case_6:
-//line machine.go:3922
+//line machine.go:3966
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr27
@@ -3964,7 +4008,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof7
 		}
 	st_case_7:
-//line machine.go:3975
+//line machine.go:4019
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
@@ -4284,12 +4328,16 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof24
 		}
 	st_case_24:
-//line machine.go:4295
+//line machine.go:4339
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
 		case 58:
 			goto tr16
+		case 80:
+			goto st25
+		case 85:
+			goto st27
 		case 91:
 			goto tr17
 		case 112:
@@ -4308,6 +4356,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 82:
+			goto st26
 		case 91:
 			goto tr17
 		case 114:
@@ -4338,6 +4388,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 71:
+			goto st26
 		case 91:
 			goto tr17
 		case 103:
@@ -4378,12 +4430,14 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof28
 		}
 	st_case_28:
-//line machine.go:4389
+//line machine.go:4441
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
 		case 58:
 			goto tr16
+		case 69:
+			goto st29
 		case 91:
 			goto tr17
 		case 101:
@@ -4400,6 +4454,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 67:
+			goto st26
 		case 91:
 			goto tr17
 		case 99:
@@ -4440,12 +4496,14 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof30
 		}
 	st_case_30:
-//line machine.go:4451
+//line machine.go:4507
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
 		case 58:
 			goto tr16
+		case 69:
+			goto st31
 		case 91:
 			goto tr17
 		case 101:
@@ -4462,6 +4520,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 66:
+			goto st26
 		case 91:
 			goto tr17
 		case 98:
@@ -4502,12 +4562,16 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof32
 		}
 	st_case_32:
-//line machine.go:4513
+//line machine.go:4573
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
 		case 58:
 			goto tr16
+		case 65:
+			goto st33
+		case 85:
+			goto st34
 		case 91:
 			goto tr17
 		case 97:
@@ -4526,6 +4590,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 78:
+			goto st26
 		case 91:
 			goto tr17
 		case 110:
@@ -4542,6 +4608,10 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 76:
+			goto st26
+		case 78:
+			goto st26
 		case 91:
 			goto tr17
 		case 108:
@@ -4584,12 +4654,14 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof35
 		}
 	st_case_35:
-//line machine.go:4595
+//line machine.go:4665
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
 		case 58:
 			goto tr16
+		case 65:
+			goto st36
 		case 91:
 			goto tr17
 		case 97:
@@ -4606,6 +4678,10 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 82:
+			goto st26
+		case 89:
+			goto st26
 		case 91:
 			goto tr17
 		case 114:
@@ -4648,12 +4724,14 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof37
 		}
 	st_case_37:
-//line machine.go:4659
+//line machine.go:4735
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
 		case 58:
 			goto tr16
+		case 79:
+			goto st38
 		case 91:
 			goto tr17
 		case 111:
@@ -4670,6 +4748,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 86:
+			goto st26
 		case 91:
 			goto tr17
 		case 118:
@@ -4710,12 +4790,14 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof39
 		}
 	st_case_39:
-//line machine.go:4721
+//line machine.go:4801
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
 		case 58:
 			goto tr16
+		case 67:
+			goto st40
 		case 91:
 			goto tr17
 		case 99:
@@ -4732,6 +4814,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 84:
+			goto st26
 		case 91:
 			goto tr17
 		case 116:
@@ -4772,12 +4856,14 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof41
 		}
 	st_case_41:
-//line machine.go:4783
+//line machine.go:4867
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
 		case 58:
 			goto tr16
+		case 69:
+			goto st42
 		case 91:
 			goto tr17
 		case 101:
@@ -4794,6 +4880,8 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto tr16
 		case 58:
 			goto tr16
+		case 80:
+			goto st26
 		case 91:
 			goto tr17
 		case 112:
@@ -4815,7 +4903,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof43
 		}
 	st_case_43:
-//line machine.go:4826
+//line machine.go:4914
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
@@ -4931,7 +5019,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof192
 		}
 	st_case_192:
-//line machine.go:4942
+//line machine.go:5030
 		if (m.data)[(m.p)] == 32 {
 			goto tr245
 		}
@@ -4947,7 +5035,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof48
 		}
 	st_case_48:
-//line machine.go:4958
+//line machine.go:5046
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
@@ -4973,7 +5061,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof49
 		}
 	st_case_49:
-//line machine.go:4984
+//line machine.go:5072
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr16
@@ -5011,7 +5099,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 			goto _test_eof50
 		}
 	st_case_50:
-//line machine.go:5022
+//line machine.go:5110
 		switch (m.data)[(m.p)] {
 		case 32:
 			goto tr1
@@ -5640,7 +5728,7 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 				output.messageSet = true
 				output.message = string(m.text())
 
-//line machine.go:5267
+//line machine.go:5355
 			}
 		}
 

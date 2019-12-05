@@ -46,6 +46,18 @@ var tests = []testCase{
 		},
 	},
 	testCase{
+		description: "RFC3164 all caps month",
+		line:        `<13>JUL  1 09:15:22 root: yolo`,
+		expected: &SyslogMessage{
+			priority:  uint8Addr(13),
+			facility:  uint8Addr(1),
+			severity:  uint8Addr(5),
+			timestamp: timeAddr(time.Stamp, "Jul  1 09:15:22"),
+			tag:       stringAddr("root"),
+			message:   stringAddr("yolo"),
+		},
+	},
+	testCase{
 		description: "RFC3164 no host",
 		line:        `<13>Dec  1 09:15:22 root: yolo`,
 		expected: &SyslogMessage{
