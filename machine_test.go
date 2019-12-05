@@ -1,7 +1,10 @@
 package legacysyslog
 
 import (
-	"fmt"
+	"io/ioutil"
+	"net/url"
+	"os"
+	"path/filepath"
 	"testing"
 	"time"
 
@@ -272,12 +275,23 @@ func TestMachineParse(t *testing.T) {
 	m := NewMachine()
 
 	for _, test := range tests {
-		fmt.Println("TestCase:", test.description)
 		t.Log("TestCase:", test.description)
 		msg, err := m.Parse([]byte(test.line))
 		if err != nil {
 			t.Error("Test failed:", err)
 		}
 		require.Equal(t, test.expected, msg)
+	}
+}
+
+func TestWriteFuzzerCorpus(t *testing.T) {
+	err := os.MkdirAll("corpus", 0777)
+	require.NoError(t, err)
+
+	for _, test := range tests {
+		name := url.QueryEscape(test.description) + ".inital"
+		path := filepath.Join("corpus", name)
+		err := ioutil.WriteFile(path, []byte(test.line), 0666)
+		require.NoError(t, err)
 	}
 }
