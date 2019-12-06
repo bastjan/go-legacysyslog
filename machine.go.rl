@@ -173,7 +173,7 @@ ipv6heuristic = (xdigit{0,4} ':'){1,7} xdigit{1,4};
 
 # https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L456
 # TODO: check hostname and badhostname options
-hostname = ( (any - [\[ :])+ | ipv6heuristic) >mark_hostname %set_hostname ' ';
+hostname = ( (any - [\[ :]){1,255} | ipv6heuristic) >mark_hostname %set_hostname ' ';
 
 # https://github.com/syslog-ng/syslog-ng/blob/3a1bda0d9a9e42b5cd7e5a02ca05f5f896ef82b6/modules/syslogformat/syslog-format.c#L315
 tag = (any - [\[: ])* >mark %set_tag;

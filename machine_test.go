@@ -5,6 +5,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"strings"
 	"testing"
 	"time"
 
@@ -298,6 +299,18 @@ var tests = []testCase{
 		description: "Empty",
 		line:        ``,
 		expected:    &SyslogMessage{},
+	},
+	testCase{
+		description: "Hostname length limit 255",
+		line:        `<13>Dec  1 09:15:22 ` + strings.Repeat("a", 500) + ` test`,
+		expected: &SyslogMessage{
+			priority:  uint8Addr(13),
+			facility:  uint8Addr(1),
+			severity:  uint8Addr(5),
+			timestamp: timeAddr(time.Stamp, "Dec  1 09:15:22"),
+			tag:       stringAddr(strings.Repeat("a", 500)),
+			message:   stringAddr("test"),
+		},
 	},
 
 	testCase{
