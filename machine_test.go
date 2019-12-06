@@ -351,3 +351,15 @@ func BenchmarkParseStandardMessage(b *testing.B) {
 		benchres, _ = m.Parse(line)
 	}
 }
+
+func BenchmarkParseLinksysYearMessage(b *testing.B) {
+	m := NewMachine()
+
+	line := []byte(`<13>Dec  1 09:15:22 2017 0304eebf3c1e root[3037]: yolo`)
+
+	b.ResetTimer()
+
+	for n := 0; n < b.N; n++ {
+		benchres, _ = m.Parse(line)
+	}
+}

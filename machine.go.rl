@@ -3,8 +3,6 @@ package legacysyslog
 import (
 	"fmt"
 	"time"
-	"bytes"
-	"strconv"
 
 	"github.com/influxdata/go-syslog/v2/common"
 )
@@ -87,12 +85,7 @@ action set_cisco_timestamp {
 
 action append_linksys_year {
 	{
-		yearRaw := bytes.Trim(m.text(), " ")
-		year, err := strconv.Atoi(string(yearRaw))
-		if err != nil {
-			m.err = err
-			return output.export(), m.err
-		}
+		year := common.UnsafeUTF8DecimalCodePointsToInt(m.text())
 		// Date(year int, month Month, day, hour, min, sec, nsec int, loc *Location) Time
 		t := output.timestamp.UTC()
 		output.timestamp = time.Date(year, t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), time.UTC)
