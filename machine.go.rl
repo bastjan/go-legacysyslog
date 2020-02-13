@@ -4,7 +4,8 @@ import (
 	"fmt"
 	"time"
 
-	"github.com/influxdata/go-syslog/v2/common"
+	"github.com/influxdata/go-syslog/v3/common"
+	"github.com/influxdata/go-syslog/v3"
 )
 
 var _ = fmt.Print
@@ -261,7 +262,7 @@ func (m *machine) text() []byte {
 }
 
 // Parse parses the input byte array as a RFC3164 syslog message.
-func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
+func (m *machine) Parse(input []byte) (syslog.Message, error) {
 	if len(input) == 0 {
 		return (&syslogMessage{}).export(), nil
 	}
@@ -281,4 +282,15 @@ func (m *machine) Parse(input []byte) (*SyslogMessage, error) {
 	%% write exec;
 
 	return output.export(), m.err
+}
+
+// WithBestEffort enables best effort mode. Has no effect since
+// legacysyslog parsing is always best effort.
+func (m *machine) WithBestEffort() {
+}
+
+// HasBestEffort tells whether the receiving parser has best effort mode on or off.
+// Always returns true since legacysyslog parsing is always best effort.
+func (m *machine) HasBestEffort() bool {
+	return true
 }

@@ -5,7 +5,7 @@ package legacysyslog
 import (
 	"time"
 
-	"github.com/influxdata/go-syslog/v2"
+	"github.com/influxdata/go-syslog/v3"
 )
 
 type CiscoTimeClockMode int8
@@ -305,4 +305,15 @@ func (sm *SyslogMessage) Message() *string {
 // StructuredData returns the syslog structured data or nil when not set
 func (sm *SyslogMessage) StructuredData() *map[string]map[string]string {
 	return nil
+}
+
+// ComputeFromPriority set the priority values and computes facility and severity from it.
+//
+// It does NOT check the input value validity.
+func (sm *SyslogMessage) ComputeFromPriority(value uint8) {
+	sm.priority = &value
+	facility := uint8(value / 8)
+	severity := uint8(value % 8)
+	sm.facility = &facility
+	sm.severity = &severity
 }

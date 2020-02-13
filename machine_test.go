@@ -9,6 +9,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/influxdata/go-syslog/v3"
 	"github.com/stretchr/testify/require"
 )
 
@@ -351,7 +352,7 @@ func TestWriteFuzzerCorpus(t *testing.T) {
 	}
 }
 
-var benchres *SyslogMessage
+var benchres syslog.Message
 
 func BenchmarkParseStandardMessage(b *testing.B) {
 	m := NewMachine()
