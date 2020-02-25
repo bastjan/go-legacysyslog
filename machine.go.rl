@@ -62,7 +62,7 @@ action set_iso_timestamp {
 
 action set_bsd_timestamp {
 	{
-		t, err := time.Parse(time.Stamp, string(m.data[m.pTimestamp:m.p]))
+		t, err := time.ParseInLocation(time.Stamp, string(m.data[m.pTimestamp:m.p]), m.location)
 		if err != nil {
 			m.err = err
 			return output.export(), m.err
@@ -74,7 +74,7 @@ action set_bsd_timestamp {
 
 action set_cisco_timestamp {
 	{
-		t, err := time.Parse("Jan _2 2006 15:04:05", string(m.data[m.pTimestamp:m.p]))
+		t, err := time.ParseInLocation("Jan _2 2006 15:04:05", string(m.data[m.pTimestamp:m.p]), m.location)
 		if err != nil {
 			m.err = err
 			return output.export(), m.err
@@ -236,11 +236,13 @@ type machine struct {
 
 	err          error
 	bestEffort   bool
+
+	location *time.Location
 }
 
 // NewMachine creates a new FSM able to parse RFC3164 syslog messages.
 func NewMachine() *machine {
-	m := &machine{}
+	m := &machine{location: time.UTC}
 
 	%% access m.;
 	%% variable p m.p;
@@ -287,6 +289,12 @@ func (m *machine) Parse(input []byte) (syslog.Message, error) {
 // WithBestEffort enables best effort mode. Has no effect since
 // legacysyslog parsing is always best effort.
 func (m *machine) WithBestEffort() {
+}
+
+// SetLocation sets the currently used location if a timestamp does not include timezone information.
+// Default is UTC.
+func (m *machine) SetLocation(l *time.Location) {
+	m.location = l
 }
 
 // HasBestEffort tells whether the receiving parser has best effort mode on or off.

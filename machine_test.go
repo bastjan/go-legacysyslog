@@ -414,6 +414,27 @@ func TestMachineParse(t *testing.T) {
 	}
 }
 
+func TestSetLocation(t *testing.T) {
+	line := `<13>Dec  1 09:55:56 0304eebf3c1e root: yolo`
+
+	locations := []*time.Location{
+		time.UTC,
+		time.Local,
+		time.FixedZone("testzone", int(8*(time.Hour/time.Second))),
+	}
+
+	m := NewMachine()
+	for _, loc := range locations {
+		m.SetLocation(loc)
+
+		expected, _ := time.ParseInLocation(time.Stamp, "Dec  1 09:55:56", loc)
+
+		msg, err := m.Parse([]byte(line))
+		require.NoError(t, err)
+		require.Equal(t, expected, *msg.(*SyslogMessage).Base.Timestamp)
+	}
+}
+
 func TestWriteFuzzerCorpus(t *testing.T) {
 	err := os.MkdirAll("corpus", 0777)
 	require.NoError(t, err)
