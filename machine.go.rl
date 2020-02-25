@@ -87,9 +87,7 @@ action set_cisco_timestamp {
 action append_linksys_year {
 	{
 		year := common.UnsafeUTF8DecimalCodePointsToInt(m.text())
-		// Date(year int, month Month, day, hour, min, sec, nsec int, loc *Location) Time
-		t := output.timestamp.UTC()
-		output.timestamp = time.Date(year, t.Month(), t.Day(), t.Hour(), t.Minute(), t.Second(), t.Nanosecond(), time.UTC)
+		output.timestamp = output.timestamp.AddDate(year, 0, 0)
 	}
 }
 
