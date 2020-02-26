@@ -405,12 +405,13 @@ func TestMachineParse(t *testing.T) {
 	m := NewMachine()
 
 	for _, test := range tests {
-		t.Log("TestCase:", test.description)
-		msg, err := m.Parse([]byte(test.line))
-		if err != nil {
-			t.Error("Test failed:", err)
-		}
-		require.Equal(t, test.expected, msg)
+		t.Run(test.description, func(t *testing.T) {
+			msg, err := m.Parse([]byte(test.line))
+			if err != nil {
+				t.Error("Test failed:", err)
+			}
+			require.Equal(t, test.expected, msg)
+		})
 	}
 }
 
