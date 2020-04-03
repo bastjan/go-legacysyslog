@@ -55,6 +55,41 @@ var tests = []testCase{
 		},
 	},
 	testCase{
+		description: "RFC3164 no space between tag and message (with content)",
+		line:        `<13>Dec  1 09:15:22 0304eebf3c1e root[3037]:yolo`,
+		expected: &SyslogMessage{
+			Base: syslog.Base{
+				Priority:  uint8Addr(13),
+				Facility:  uint8Addr(1),
+				Severity:  uint8Addr(5),
+				Timestamp: timeAddr(time.Stamp, "Dec  1 09:15:22"),
+				Hostname:  stringAddr("0304eebf3c1e"),
+				Message:   stringAddr("yolo"),
+				Appname:   stringAddr("root"),
+				ProcID:    stringAddr("3037"),
+			},
+			Tag:     stringAddr("root"),
+			Content: stringAddr("3037"),
+		},
+	},
+	testCase{
+		description: "RFC3164 no space between tag and message",
+		line:        `<13>Dec  1 09:15:22 0304eebf3c1e root:yolo`,
+		expected: &SyslogMessage{
+			Base: syslog.Base{
+				Priority:  uint8Addr(13),
+				Facility:  uint8Addr(1),
+				Severity:  uint8Addr(5),
+				Timestamp: timeAddr(time.Stamp, "Dec  1 09:15:22"),
+				Hostname:  stringAddr("0304eebf3c1e"),
+				Message:   stringAddr("yolo"),
+				Appname:   stringAddr("root"),
+			},
+			Tag: stringAddr("root"),
+		},
+	},
+
+	testCase{
 		description: "RFC3164 all caps month",
 		line:        `<13>JUL  1 09:15:22 root: yolo`,
 		expected: &SyslogMessage{
